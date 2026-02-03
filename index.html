@@ -3,120 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valentine's Quest for Shreyashi</title>
+    <title>Valentine's Quiz for You</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #ff9a9e, #fecfef, #ffecd2);
-            color: #333;
+            background: linear-gradient(135deg, #ff9a9e, #fecfef);
+            color: #fff;
             text-align: center;
             margin: 0;
             padding: 20px;
-            overflow-x: hidden;
+            overflow: hidden; /* Prevent scrolling */
         }
-        h1, h2 { color: #e91e63; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; background: rgba(255,255,255,0.9); border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        button { background: #e91e63; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px; transition: background 0.3s; }
-        button:hover { background: #c2185b; }
-        .hearts { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-        .heart { position: absolute; color: #ff4081; font-size: 24px; animation: float 3s infinite ease-in-out; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-        .hidden { display: none; }
-        #final-message { font-size: 18px; margin-top: 20px; }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        #question {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+        }
+        .button {
+            background: #ff6b9d;
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            position: absolute;
+            animation: float 3s ease-in-out infinite;
+            transition: all 0.5s ease;
+        }
+        .button:hover {
+            background: #ff4a7d;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .float-away {
+            animation: floatAway 1s ease-out forwards;
+        }
+        @keyframes floatAway {
+            0% { opacity: 1; transform: translateY(0px); }
+            100% { opacity: 0; transform: translateY(-100px) rotate(45deg); }
+        }
+        #end-message {
+            display: none;
+            font-size: 2em;
+            margin-top: 50px;
+        }
     </style>
 </head>
 <body>
-    <div class="hearts" id="hearts"></div>
-    <div class="container">
-        <h1>Valentine's Quest for Shreyashi Trivedi Singh</h1>
-        <p>Embark on a hilarious adventure to unlock my love! 💖</p>
-        
-        <!-- Level 1 -->
-        <div id="level1">
-            <h2>Level 1: The Heart Clicker Challenge</h2>
-            <p>Click the hearts as fast as you can! (Hint: There are 5 sneaky ones.)</p>
-            <div id="hearts-game">
-                <button onclick="clickHeart(1)">❤️</button>
-                <button onclick="clickHeart(2)">💖</button>
-                <button onclick="clickHeart(3)">💕</button>
-                <button onclick="clickHeart(4)">💗</button>
-                <button onclick="clickHeart(5)">💓</button>
-            </div>
-            <p id="click-count">Hearts clicked: 0/5</p>
-        </div>
-        
-        <!-- Level 2 -->
-        <div id="level2" class="hidden">
-            <h2>Level 2: The Funny Riddle</h2>
-            <p>What has keys but can't open locks? (Think romance!)</p>
-            <input type="text" id="riddle-answer" placeholder="Your answer...">
-            <button onclick="checkRiddle()">Submit</button>
-            <p id="riddle-feedback" class="hidden">Wrong! Try again, my love. (Hint: It's not a piano... or is it?)</p>
-        </div>
-        
-        <!-- Level 3 -->
-        <div id="level3" class="hidden">
-            <h2>Level 3: The Ultimate Choice</h2>
-            <p>Will you be my Valentine forever? (Choose wisely!)</p>
-            <button onclick="finalChoice('yes')">Yes! 💑</button>
-            <button onclick="finalChoice('no')">No... 😢</button>
-        </div>
-        
-        <!-- Final Message -->
-        <div id="final" class="hidden">
-            <h2>Quest Complete! 🎉</h2>
-            <p id="final-message">Happy Valentine's Day, Shreyashi! You're the key to my heart (pun intended). I love you more than pizza, and that's saying something! Let's make more memories together. ❤️</p>
-            <p>(P.S. If you said 'no' earlier, just kidding—it's a trap!)</p>
-        </div>
-    </div>
+    <h1>Happy Valentine's Day, My Love! 💖</h1>
+    <div id="question"></div>
+    <div id="buttons"></div>
+    <div id="end-message">You've completed the quiz! I love you more than words can say. ❤️</div>
 
     <script>
-        let heartsClicked = 0;
-        const totalHearts = 5;
-
-        // Floating hearts animation
-        function createHearts() {
-            const heartsContainer = document.getElementById('hearts');
-            for (let i = 0; i < 10; i++) {
-                const heart = document.createElement('div');
-                heart.className = 'heart';
-                heart.innerHTML = '❤️';
-                heart.style.left = Math.random() * 100 + '%';
-                heart.style.animationDelay = Math.random() * 3 + 's';
-                heartsContainer.appendChild(heart);
+        const questions = [
+            {
+                question: "What's my favorite color?",
+                options: ["Red", "Blue", "Pink", "Green"],
+                correct: "Pink" // Not used for scoring, just for flow
+            },
+            {
+                question: "Where was our first date?",
+                options: ["Park", "Restaurant", "Beach", "Home"],
+                correct: "Park"
+            },
+            {
+                question: "What's the one thing I love most about you?",
+                options: ["Your smile", "Your laugh", "Your kindness", "Everything"],
+                correct: "Everything"
+            },
+            {
+                question: "What's our favorite movie to watch together?",
+                options: ["Rom-com", "Action", "Horror", "Documentary"],
+                correct: "Rom-com"
             }
-        }
-        createHearts();
+        ];
 
-        // Level 1: Heart clicker
-        function clickHeart(num) {
-            heartsClicked++;
-            document.getElementById('click-count').textContent = `Hearts clicked: ${heartsClicked}/${totalHearts}`;
-            if (heartsClicked >= totalHearts) {
-                document.getElementById('level1').classList.add('hidden');
-                document.getElementById('level2').classList.remove('hidden');
+        let currentQuestionIndex = 0;
+        const questionEl = document.getElementById('question');
+        const buttonsEl = document.getElementById('buttons');
+        const endMessageEl = document.getElementById('end-message');
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                questionEl.style.display = 'none';
+                buttonsEl.innerHTML = '';
+                endMessageEl.style.display = 'block';
+                return;
             }
+
+            const q = questions[currentQuestionIndex];
+            questionEl.textContent = q.question;
+            buttonsEl.innerHTML = '';
+
+            q.options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'button';
+                button.textContent = option;
+                button.style.left = Math.random() * 80 + '%'; // Random horizontal position
+                button.style.top = Math.random() * 60 + 20 + '%'; // Random vertical position
+                button.addEventListener('click', () => {
+                    button.classList.add('float-away');
+                    setTimeout(() => {
+                        currentQuestionIndex++;
+                        loadQuestion();
+                    }, 1000); // Wait for animation
+                });
+                buttonsEl.appendChild(button);
+            });
         }
 
-        // Level 2: Riddle
-        function checkRiddle() {
-            const answer = document.getElementById('riddle-answer').value.toLowerCase();
-            if (answer.includes('piano') || answer.includes('keyboard')) {
-                document.getElementById('level2').classList.add('hidden');
-                document.getElementById('level3').classList.remove('hidden');
-            } else {
-                document.getElementById('riddle-feedback').classList.remove('hidden');
-            }
-        }
-
-        // Level 3: Final choice
-        function finalChoice(choice) {
-            document.getElementById('level3').classList.add('hidden');
-            document.getElementById('final').classList.remove('hidden');
-            if (choice === 'no') {
-                document.getElementById('final-message').textContent = "Just kidding! Happy Valentine's Day anyway, Shreyashi. You're stuck with me! 😘";
-            }
-        }
+        loadQuestion();
     </script>
 </body>
 </html>
