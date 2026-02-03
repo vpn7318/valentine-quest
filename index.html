@@ -47,7 +47,34 @@
         @keyframes floatAway {
             0% { opacity: 1; transform: translateY(0px); }
             100% { opacity: 0; transform: translateY(-100px) rotate(45deg); }
-        }
+        }/* ... existing body, h1, #question styles ... */
+
+.button {
+    background: #ff6b9d;
+    border: none;
+    color: white;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    border-radius: 50px;
+    cursor: pointer;
+    position: absolute;
+    transition: all 0.3s ease; /* Smooth movement */
+}
+.button:hover {
+    background: #ff4a7d;
+}
+/* Remove the old @keyframes float and .float-away */
+
+.run-away {
+    animation: runAway 0.5s ease-out forwards;
+}
+@keyframes runAway {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2) rotate(10deg); }
+    100% { transform: scale(0.8) rotate(-10deg); } /* Quick shrink/rotate to simulate running */
+}
+
+/* ... existing #end-message ... */
         #end-message {
             display: none;
             font-size: 2em;
