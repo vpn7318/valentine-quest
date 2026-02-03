@@ -32,7 +32,7 @@
             cursor: pointer;
             position: absolute;
             animation: float 3s ease-in-out infinite;
-            transition: left 1s ease, top 1s ease; /* Add this line for smooth repositioning */
+            transition: all 0.5s ease; /* Smooth transitions for movement */
         }
         .button:hover {
             background: #ff4a7d;
@@ -47,34 +47,7 @@
         @keyframes floatAway {
             0% { opacity: 1; transform: translateY(0px); }
             100% { opacity: 0; transform: translateY(-100px) rotate(45deg); }
-        }/* ... existing body, h1, #question styles ... */
-
-.button {
-    background: #ff6b9d;
-    border: none;
-    color: white;
-    padding: 15px 30px;
-    font-size: 1.2em;
-    border-radius: 50px;
-    cursor: pointer;
-    position: absolute;
-    transition: all 0.3s ease; /* Smooth movement */
-}
-.button:hover {
-    background: #ff4a7d;
-}
-/* Remove the old @keyframes float and .float-away */
-
-.run-away {
-    animation: runAway 0.5s ease-out forwards;
-}
-@keyframes runAway {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2) rotate(10deg); }
-    100% { transform: scale(0.8) rotate(-10deg); } /* Quick shrink/rotate to simulate running */
-}
-
-/* ... existing #end-message ... */
+        }
         #end-message {
             display: none;
             font-size: 2em;
@@ -83,33 +56,32 @@
     </style>
 </head>
 <body>
-    <h1>Happy Valentine's Day</h1>
-    <h2>Mrs.Shreyashi Trivedi Singh 💖</h2>
+    <h1>Happy Valentine's Day, My Love! 💖</h1>
     <div id="question"></div>
     <div id="buttons"></div>
-    <div id="end-message">You did it! I love you more than words can say. ❤️</div>
+    <div id="end-message">You've completed the quiz! I love you more than words can say. ❤️</div>
 
     <script>
         const questions = [
             {
-                question: "Where we meet first time?",
-                options: ["Instagram", "Whatsapp", "Snapchat", "Facebook"],
-                correct: "Snapchat" // Not used for scoring, just for flow
+                question: "What's my favorite color?",
+                options: ["Red", "Blue", "Pink", "Green"],
+                correct: "Pink"
             },
             {
-                question: "Where did I romantically touch my lips to yours?",
-                options: ["Passage", "Restaurant", "Temple", "Home"],
-                correct: "Passage"
+                question: "Where was our first date?",
+                options: ["Park", "Restaurant", "Beach", "Home"],
+                correct: "Park"
             },
             {
                 question: "What's the one thing I love most about you?",
-                options: ["Your smile", "Your eyes", "Your laugh", "your simplicity"],
-                correct: "your simplicity"
+                options: ["Your smile", "Your laugh", "Your kindness", "Everything"],
+                correct: "Everything"
             },
             {
-                question: "What's the best time you spend with me?",
-                options: ["On Phone", "In School", "In Bus", "At Temple"],
-                correct: "In Bus"
+                question: "What's our favorite movie to watch together?",
+                options: ["Rom-com", "Action", "Horror", "Documentary"],
+                correct: "Rom-com"
             }
         ];
 
@@ -117,12 +89,14 @@
         const questionEl = document.getElementById('question');
         const buttonsEl = document.getElementById('buttons');
         const endMessageEl = document.getElementById('end-message');
+        let movementInterval;
 
         function loadQuestion() {
             if (currentQuestionIndex >= questions.length) {
                 questionEl.style.display = 'none';
                 buttonsEl.innerHTML = '';
                 endMessageEl.style.display = 'block';
+                if (movementInterval) clearInterval(movementInterval);
                 return;
             }
 
@@ -134,17 +108,51 @@
                 const button = document.createElement('button');
                 button.className = 'button';
                 button.textContent = option;
-                button.style.left = Math.random() * 80 + '%'; // Random horizontal position
-                button.style.top = Math.random() * 60 + 20 + '%'; // Random vertical position
-                button.addEventListener('click', () => {
-                    button.classList.add('float-away');
-                    setTimeout(() => {
-                        currentQuestionIndex++;
-                        loadQuestion();
-                    }, 1000); // Wait for animation
+                button.style.left = Math.random() * 90 + '%';
+                button.style.top = Math.random() * 80 + 10 + '%';
+                button.dataset.runAwayCount = 0;
+
+                button.addEventListener('mouseenter', () => {
+                    if (parseInt(button.dataset.runAwayCount) < 3) {
+                        runAway(button);
+                    }
                 });
+                button.addEventListener('click', () => {
+                    if (parseInt(button.dataset.runAwayCount) < 3) {
+                        runAway(button);
+                    } else {
+                        button.classList.add('float-away');
+                        setTimeout(() => {
+                            currentQuestionIndex++;
+                            loadQuestion();
+                        }, 1000);
+                    }
+                });
+
                 buttonsEl.appendChild(button);
             });
+
+            startRandomMovement();
+        }
+
+        function runAway(button) {
+            button.dataset.runAwayCount = parseInt(button.dataset.runAwayCount) + 1;
+            button.style.left = Math.random() * 90 + '%';
+            button.style.top = Math.random() * 80 + 10 + '%';
+            button.style.transition = 'all 0.3s ease';
+        }
+
+        function startRandomMovement() {
+            if (movementInterval) clearInterval(movementInterval);
+            movementInterval = setInterval(() => {
+                const buttons = document.querySelectorAll('.button');
+                buttons.forEach(button => {
+                    if (parseInt(button.dataset.runAwayCount) < 3) {
+                        button.style.left = Math.random() * 90 + '%';
+                        button.style.top = Math.random() * 80 + 10 + '%';
+                    }
+                });
+            }, 1500);
         }
 
         loadQuestion();
