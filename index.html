@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valentine's Quiz for You</title>
+    <title>Virtual Valentine's Quiz</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -12,147 +12,142 @@
             text-align: center;
             margin: 0;
             padding: 20px;
-            overflow: hidden; /* Prevent scrolling */
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         h1 {
             font-size: 2.5em;
             margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
-        #question {
+        .question {
             font-size: 1.5em;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 10;
         }
-        .button {
-            background: #ff6b9d;
+        .option {
+            background: rgba(255, 255, 255, 0.8);
+            color: #e91e63;
             border: none;
-            color: white;
+            border-radius: 50px;
             padding: 15px 30px;
             font-size: 1.2em;
-            border-radius: 50px;
             cursor: pointer;
             position: absolute;
-            animation: float 3s ease-in-out infinite;
-            transition: all 0.5s ease; /* Smooth transitions for movement */
+            animation: float 5s infinite ease-in-out;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.5s ease, opacity 0.5s ease;
         }
-        .button:hover {
-            background: #ff4a7d;
+        .option:hover {
+            transform: scale(1.1);
+        }
+        .option.float-away {
+            animation: float-away 1s forwards;
         }
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            25% { transform: translateY(-20px) translateX(20px); }
+            50% { transform: translateY(-40px) translateX(-20px); }
+            75% { transform: translateY(-20px) translateX(20px); }
         }
-        .float-away {
-            animation: floatAway 1s ease-out forwards;
+        @keyframes float-away {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.5) translateY(-100px) translateX(100px); }
         }
-        @keyframes floatAway {
-            0% { opacity: 1; transform: translateY(0px); }
-            100% { opacity: 0; transform: translateY(-100px) rotate(45deg); }
-        }
-        #end-message {
-            display: none;
+        .heart-burst {
+            position: absolute;
             font-size: 2em;
-            margin-top: 50px;
+            color: #ff4081;
+            animation: burst 1s forwards;
+            pointer-events: none;
+        }
+        @keyframes burst {
+            0% { opacity: 1; transform: scale(0); }
+            50% { transform: scale(1.5); }
+            100% { opacity: 0; transform: scale(2); }
+        }
+        .end-message {
+            font-size: 2em;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <h1>Happy Valentine's Day, My Love! 💖</h1>
-    <div id="question"></div>
-    <div id="buttons"></div>
-    <div id="end-message">You've completed the quiz! I love you more than words can say. ❤️</div>
+    <h1>💖 Virtual Valentine's Quiz 💖</h1>
+    <div class="question" id="question">What's your favorite romantic activity?</div>
+    <div id="options"></div>
+    <div class="end-message" id="end-message">Happy Valentine's Day! You're amazing! ❤️</div>
 
     <script>
         const questions = [
             {
-                question: "What's my favorite color?",
-                options: ["Red", "Blue", "Pink", "Green"],
-                correct: "Pink"
+                text: "What's your favorite romantic activity?",
+                options: ["Stargazing", "Cooking together", "Dancing", "Picnic"]
             },
             {
-                question: "Where was our first date?",
-                options: ["Park", "Restaurant", "Beach", "Home"],
-                correct: "Park"
+                text: "What's your dream date?",
+                options: ["Beach sunset", "City lights", "Mountain hike", "Cozy movie night"]
             },
             {
-                question: "What's the one thing I love most about you?",
-                options: ["Your smile", "Your laugh", "Your kindness", "Everything"],
-                correct: "Everything"
+                text: "What's your love language?",
+                options: ["Words of affirmation", "Acts of service", "Physical touch", "Quality time"]
             },
             {
-                question: "What's our favorite movie to watch together?",
-                options: ["Rom-com", "Action", "Horror", "Documentary"],
-                correct: "Rom-com"
+                text: "What's your favorite flower?",
+                options: ["Rose", "Lily", "Tulip", "Sunflower"]
+            },
+            {
+                text: "What's your ideal Valentine's gift?",
+                options: ["Jewelry", "Chocolate", "A handwritten letter", "A surprise trip"]
             }
         ];
 
         let currentQuestionIndex = 0;
         const questionEl = document.getElementById('question');
-        const buttonsEl = document.getElementById('buttons');
+        const optionsEl = document.getElementById('options');
         const endMessageEl = document.getElementById('end-message');
-        let movementInterval;
 
         function loadQuestion() {
             if (currentQuestionIndex >= questions.length) {
                 questionEl.style.display = 'none';
-                buttonsEl.innerHTML = '';
+                optionsEl.innerHTML = '';
                 endMessageEl.style.display = 'block';
-                if (movementInterval) clearInterval(movementInterval);
                 return;
             }
-
             const q = questions[currentQuestionIndex];
-            questionEl.textContent = q.question;
-            buttonsEl.innerHTML = '';
-
-            q.options.forEach(option => {
-                const button = document.createElement('button');
-                button.className = 'button';
-                button.textContent = option;
-                button.style.left = Math.random() * 90 + '%';
-                button.style.top = Math.random() * 80 + 10 + '%';
-                button.dataset.runAwayCount = 0;
-
-                button.addEventListener('mouseenter', () => {
-                    if (parseInt(button.dataset.runAwayCount) < 3) {
-                        runAway(button);
-                    }
-                });
-                button.addEventListener('click', () => {
-                    if (parseInt(button.dataset.runAwayCount) < 3) {
-                        runAway(button);
-                    } else {
-                        button.classList.add('float-away');
-                        setTimeout(() => {
-                            currentQuestionIndex++;
-                            loadQuestion();
-                        }, 1000);
-                    }
-                });
-
-                buttonsEl.appendChild(button);
+            questionEl.textContent = q.text;
+            optionsEl.innerHTML = '';
+            q.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.textContent = option;
+                btn.style.left = Math.random() * 70 + '%';
+                btn.style.top = Math.random() * 60 + '%';
+                btn.onclick = () => selectOption(btn);
+                optionsEl.appendChild(btn);
             });
-
-            startRandomMovement();
         }
 
-        function runAway(button) {
-            button.dataset.runAwayCount = parseInt(button.dataset.runAwayCount) + 1;
-            button.style.left = Math.random() * 90 + '%';
-            button.style.top = Math.random() * 80 + 10 + '%';
-            button.style.transition = 'all 0.3s ease';
-        }
-
-        function startRandomMovement() {
-            if (movementInterval) clearInterval(movementInterval);
-            movementInterval = setInterval(() => {
-                const buttons = document.querySelectorAll('.button');
-                buttons.forEach(button => {
-                    if (parseInt(button.dataset.runAwayCount) < 3) {
-                        button.style.left = Math.random() * 90 + '%';
-                        button.style.top = Math.random() * 80 + 10 + '%';
-                    }
-                });
-            }, 1500);
+        function selectOption(btn) {
+            btn.classList.add('float-away');
+            // Add heart burst effect
+            const burst = document.createElement('div');
+            burst.className = 'heart-burst';
+            burst.textContent = '💖';
+            burst.style.left = btn.style.left;
+            burst.style.top = btn.style.top;
+            document.body.appendChild(burst);
+            setTimeout(() => burst.remove(), 1000);
+            // Load next question after animation
+            setTimeout(() => {
+                currentQuestionIndex++;
+                loadQuestion();
+            }, 1000);
         }
 
         loadQuestion();
